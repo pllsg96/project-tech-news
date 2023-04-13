@@ -5,15 +5,13 @@ import time
 # Requisito 1
 def fetch(url):
     try:
-        time.sleep(2)
-        response = requests.get(url)
-
-        if (response.status_code == 200):
-            return response.text
-        else:
-            return None
-    except requests.ReadTimeout:
+        time.sleep(1)
+        response = requests.get(url, timeout=3)
+        response.raise_for_status()
+    except (requests.HTTPError, requests.ReadTimeout):
         return None
+    else:
+        return response.text
 
 
 # Requisito 2
