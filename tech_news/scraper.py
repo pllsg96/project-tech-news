@@ -1,7 +1,8 @@
 import requests
 import time
 from parsel import Selector
-from pprint import pprint
+# from pprint import pprint
+from tech_news.database import create_news
 
 
 # Requisito 1
@@ -69,10 +70,28 @@ def scrape_news(html_content):
 # Requisito 5
 def get_tech_news(amount):
     """Seu código deve vir aqui"""
+    html_page_data = fetch("https://blog.betrybe.com")
+    all_urls = scrape_updates(html_page_data)
+    while (len(all_urls) < amount):
+        next_button = scrape_next_page_link(html_page_data)
+        html_page_data = fetch(next_button)
+        current_page_urls = scrape_updates(html_page_data)
+        all_urls.extend(current_page_urls)
+
+    all_news_data = []
+    for x in range(amount):
+        each_new_data = fetch(all_urls[x])
+        scraping_page = scrape_news(each_new_data)
+        all_news_data.append(scraping_page)
+        print(all_urls[x])
+
+    create_news(all_news_data)
+
+    return all_news_data
 
 
-if __name__ == "__main__":
-    url = ("https://blog.betrybe.com/carreira/frases-de-lideranca/")
-    site_trybe = fetch(url)
-    xomps = scrape_news(site_trybe)
-    pprint(xomps)
+# if __name__ == "__main__":
+#     # url = ("https://blog.betrybe.com/carreira/frases-de-lideranca/")
+#     # site_trybe = fetch(url)
+#     xomps = get_tech_news(2)
+#     print(xomps)
